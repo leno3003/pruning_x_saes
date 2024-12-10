@@ -60,8 +60,8 @@ if str(exercises_dir) not in sys.path:
 import utils as part31_utils
 
 NUMBER_OF_INSTANCES = 8
-NUMBER_OF_INPUT_FEATURES = 5
-NUMBER_OF_HIDDEN_UNITS = 2
+NUMBER_OF_INPUT_FEATURES = 20
+NUMBER_OF_HIDDEN_UNITS = 5
 TRAINING_STEPS = 10_000
 SPARSITY_THRESHOLD = 90
 
@@ -94,27 +94,28 @@ while sparsity < SPARSITY_THRESHOLD:
 
     model.optimize(steps=TRAINING_STEPS)
     
-    directory = base_artifacts_path + f'{NUMBER_OF_INSTANCES}_instances/'+ f'pruning_iteration_{pruning_iteration}/'
+    directory = base_artifacts_path + f'I_{NUMBER_OF_INPUT_FEATURES}_H_{NUMBER_OF_HIDDEN_UNITS}/' + f'{NUMBER_OF_INSTANCES}_instances/'+ f'pruning_iteration_{pruning_iteration}/'
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    if NUMBER_OF_INSTANCES == 1:
-        part31_utils.plot_features_in_2d(
-            model.W,
-            colors=model.importance,
-            title=f"Superposition: {cfg.n_features} features represented in 2D space",
-            subplot_titles=[f"1 - S = {i:.3f}" for i in feature_probability],
-            path= directory + f'2D_toy_model_superposition_{sparsity}.webp',
-        )
+    if NUMBER_OF_HIDDEN_UNITS == 2:
+        if NUMBER_OF_INSTANCES == 1:
+            part31_utils.plot_features_in_2d(
+                model.W,
+                colors=model.importance,
+                title=f"Superposition: {cfg.n_features} features represented in 2D space",
+                subplot_titles=[f"1 - S = {i:.3f}" for i in feature_probability],
+                path= directory + f'2D_toy_model_superposition_{sparsity}.webp',
+            )
 
-    else:
-        part31_utils.plot_features_in_2d(
-            model.W,
-            colors=model.importance,
-            title=f"Superposition: {cfg.n_features} features represented in 2D space",
-            subplot_titles=[f"1 - S = {i:.3f}" for i in feature_probability.squeeze()],
-            path= directory + f'2D_toy_model_superposition_{sparsity}.webp',
-        )
+        else:
+            part31_utils.plot_features_in_2d(
+                model.W,
+                colors=model.importance,
+                title=f"Superposition: {cfg.n_features} features represented in 2D space",
+                subplot_titles=[f"1 - S = {i:.3f}" for i in feature_probability.squeeze()],
+                path= directory + f'2D_toy_model_superposition_{sparsity}.webp',
+            )
     
     with t.inference_mode():
         batch = model.generate_batch(200)
@@ -132,9 +133,9 @@ while sparsity < SPARSITY_THRESHOLD:
             model.W,
             height=800,
             width=1600,
-            title="ReLU output model: n_features = 80, d_hidden = 20, I<sub>i</sub> = 0.9<sup>i</sup>",
+            title=f"ReLU output model: n_features = {NUMBER_OF_INPUT_FEATURES}, d_hidden = {NUMBER_OF_HIDDEN_UNITS}, I<sub>i</sub> = 0.9<sup>i</sup>",
             subplot_titles=[f"Feature prob = {i:.3f}" for i in feature_probability],
-            path = directory + f'ND_toy_model_hidden_{sparsity}.webp',
+            path = directory + f'ND_toy_model_hidden_{sparsity}.html',
         )
     
     model = prune_model(model)

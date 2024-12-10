@@ -322,6 +322,7 @@ def plot_features_in_Nd(
 
     if path is not None:
         fig.write_html(path)
+        # fig.write_image(path)
     else: 
         fig.show()
 
